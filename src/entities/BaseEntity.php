@@ -38,6 +38,9 @@ class BaseEntity
             );
         }    
         $this->type = $type;
+        if ($this->type == self::TYPE_GUID_STR_36) {
+            $this->id = $this->generateGuid();
+        }
         $this->create_date = new \DateTimeImmutable;
         $this->update_date = new \DateTimeImmutable;
     }
@@ -79,13 +82,9 @@ class BaseEntity
         $valid = false;
         switch ($this->type) {
             case 'guid_string_36':
-                if (is_string($value) && preg_match(
-                    '/^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/i',
-                    $value
-                )) {
-                    $valid = true;
-                }
-                break;
+                throw new \BadMethodCallException('Setting read-only property: '
+                    . get_class($this) . '::$id'
+                );
 
             case 'integer':
                 if (is_int($value)) {
@@ -115,5 +114,25 @@ class BaseEntity
     public function getUpdate_date()
     {
         return $this->update_date;
+    }
+
+    private function generateGuid()
+    {
+        if (function_exists('com_create_guid') === true) {
+            $guid = trim(com_create_guid(), '{}');
+        } else {
+            $guid = sprintf('%04X%04X-%04X-%04X-%04X-%04X%04X%04X',
+                mt_rand(0, 65535),
+                mt_rand(0, 65535),
+                mt_rand(0, 65535),
+                mt_rand(16384, 20479),
+                mt_rand(32768, 49151),
+                mt_rand(0, 65535),
+                mt_rand(0, 65535),
+                mt_rand(0, 65535)
+            );
+        }
+
+        return $guid;
     }
 }

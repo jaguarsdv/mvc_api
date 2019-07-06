@@ -7,7 +7,7 @@ use src\entities\BaseEntity;
 
 class CreateTest extends Unit
 {
-    public function testSuccess()
+    public function testBaseEntityCreationSuccess()
     {
         $base_entity = new BaseEntity(BaseEntity::TYPE_GUID_STR_36);
  
@@ -17,10 +17,12 @@ class CreateTest extends Unit
             $base_entity->id
         ));
         $this->assertNotNull($base_entity->create_date);
+        $this->assertTrue($base_entity->create_date instanceof \DateTimeImmutable);
         $this->assertNotNull($base_entity->update_date);
+        $this->assertTrue($base_entity->update_date instanceof \DateTimeImmutable);
     }
 
-    public function testWrongIdType()
+    public function testBaseEntityWrongIdType()
     {
         $this->expectExceptionMessage('Неверный тип идентификатора');
  
@@ -28,7 +30,7 @@ class CreateTest extends Unit
         $base_entity->id = '4DB203C0-6B6E-44D5-B2C9-95DB6B143028';
     }
 
-    public function testIdIsReadOnly()
+    public function testBaseEntityGuidIdIsReadOnly()
     {
         $this->expectExceptionMessage('Setting read-only property: '
             . BaseEntity::class . '::$id'
@@ -36,5 +38,13 @@ class CreateTest extends Unit
  
         $base_entity = new BaseEntity(BaseEntity::TYPE_GUID_STR_36);
         $base_entity->id = '4DB203C0-6B6E-44D5-B2C9-95DB6B143028';
+    }
+
+    public function testBaseEntityIntIdIsSettable()
+    {
+        $base_entity = new BaseEntity(BaseEntity::TYPE_INT);
+
+        $base_entity->id = 3;
+        $this->assertEquals(3, $base_entity->id);
     }
 }

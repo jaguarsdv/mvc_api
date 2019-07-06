@@ -7,7 +7,7 @@ use src\entities\Product;
 
 class CreateTest extends Unit
 {
-    public function testSuccess()
+    public function testProductCreationSuccess()
     {
         $product = new Product('Товар', 250.78);
  
@@ -17,7 +17,7 @@ class CreateTest extends Unit
         $this->assertEquals(250.78, $product->price);
     }
 
-    public function testCildClassIdIsReadOnly()
+    public function testProductIdIsReadOnly()
     {
         $this->expectExceptionMessage('Setting read-only property: '
             . Product::class . '::$id'

@@ -1,0 +1,45 @@
+#!/usr/bin/env php
+<?php
+
+require __DIR__.'/vendor/autoload.php';
+
+use Symfony\Component\Console\Application;
+use src\commands\FillProductTable;
+use Doctrine\DBAL\DriverManager;
+use Symfony\Component\Console\Helper\HelperSet;
+use Symfony\Component\Console\Helper\QuestionHelper;
+use Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper;
+use Doctrine\Migrations\Tools\Console\Command\DumpSchemaCommand;
+use Doctrine\Migrations\Tools\Console\Command\ExecuteCommand;
+use Doctrine\Migrations\Tools\Console\Command\GenerateCommand;
+use Doctrine\Migrations\Tools\Console\Command\LatestCommand;
+use Doctrine\Migrations\Tools\Console\Command\MigrateCommand;
+use Doctrine\Migrations\Tools\Console\Command\RollupCommand;
+use Doctrine\Migrations\Tools\Console\Command\StatusCommand;
+use Doctrine\Migrations\Tools\Console\Command\VersionCommand;
+
+$dbParams = require __DIR__ . '/config/db.php';
+
+$connection = DriverManager::getConnection($dbParams);
+
+$helperSet = new HelperSet();
+$helperSet->set(new QuestionHelper(), 'question');
+$helperSet->set(new ConnectionHelper($connection), 'db');
+
+$application = new Application();
+$application->setCatchExceptions(true);
+$application->setHelperSet($helperSet);
+
+$application->addCommands([
+    new FillProductTable,
+    new DumpSchemaCommand,
+    new ExecuteCommand,
+    new GenerateCommand,
+    new LatestCommand,
+    new MigrateCommand,
+    new RollupCommand,
+    new StatusCommand,
+    new VersionCommand,
+]);
+
+$application->run();    

@@ -1,0 +1,8 @@
+name: mvc_api migrations
+migrations_namespace: src\migrations
+table_name: migrations
+column_name: version
+column_length: 14
+executed_at_column_name: executed_at
+migrations_directory: /d/www/mvc_api/src/migrations
+all_or_nothing: true

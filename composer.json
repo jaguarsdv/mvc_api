@@ -11,7 +11,11 @@
     "minimum-stability": "stable",
     "require": {
         "codeception/codeception": "^3.0",
-        "zircote/swagger-php": "^3.0"
+        "zircote/swagger-php": "^3.0",
+        "symfony/routing": "^4.3",
+        "symfony/console": "^4.3",
+        "doctrine/migrations": "2.0",
+        "symfony/yaml": "^4.3"
     },
     "autoload": {
         "psr-4": {

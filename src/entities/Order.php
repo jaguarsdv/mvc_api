@@ -44,21 +44,33 @@ class Order extends BaseEntity
         $this->status_id = self::STATUS_NEW;
     }
 
+    /**
+     * @return User
+     */
     public function getUser()
     {
         return $this->user;
     }
 
+    /**
+     * @return Product[]
+     */
     public function getProducts()
     {
         return $this->products;
     }
 
+    /**
+     * @return integer
+     */
     public function getStatus_id()
     {
         return $this->status_id;
     }
 
+    /**
+     * @return float
+     */
     public function getSum()
     {
         if (!$this->sum) {

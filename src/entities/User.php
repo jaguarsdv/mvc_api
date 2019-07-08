@@ -29,12 +29,16 @@ class User extends BaseEntity
      * @property string $login
      * @property string $password
      */
-    public function __construct(int $id, string $login, string $password)
+    public function __construct(int $id, string $login, string $password = null)
     {
         parent::__construct(BaseEntity::TYPE_INT);
         $this->id = $id;
         $this->login = $login;
-        $this->password = $password;
+        if ($password) {
+            $this->password = $password;
+        } else {
+            $this->password = (string) mt_rand(1000, 9999);
+        }
     }
 
     public function getLogin()

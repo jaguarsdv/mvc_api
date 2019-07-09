@@ -3,7 +3,7 @@
 namespace tests\unit\entities\User;
 
 use Codeception\Test\Unit;
-use src\entities\User;
+use src\models\entities\User;
 
 class CreateTest extends Unit
 {

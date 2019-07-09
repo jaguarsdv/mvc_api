@@ -1,6 +1,6 @@
 <?php
 
-namespace src\entities;
+namespace src\models\entities;
 
 /**
  * @property string $id
@@ -31,7 +31,7 @@ class User extends BaseEntity
      */
     public function __construct(int $id, string $login, string $password = null)
     {
-        parent::__construct(BaseEntity::TYPE_INT);
+        parent::__construct($id, BaseEntity::TYPE_INT);
         $this->id = $id;
         $this->login = $login;
         if ($password) {

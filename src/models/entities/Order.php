@@ -1,11 +1,11 @@
 <?php
 
-namespace src\entities;
+namespace src\models\entities;
 
 /**
  * @property string $id
- * @property \DateTimeImmutable $create_time
- * @property \DateTimeImmutable $update_time
+ * @property \DateTimeImmutable $create_date
+ * @property \DateTimeImmutable $update_date
  */
 class Order extends BaseEntity
 {
@@ -33,15 +33,41 @@ class Order extends BaseEntity
     private $status_id;
 
     /**
+     * @var \DateTimeImmutable
+     */
+    protected $create_date;
+
+    /**
+     * @var \DateTimeImmutable
+     */
+
+     protected $update_date;
+    /**
      * @property User $user
      * @property Product[] $products
      */
-    public function __construct(User $user, array $products = [])
-    {
-        parent::__construct(BaseEntity::TYPE_GUID_STR_36);
+    public function __construct(
+        string $id,
+        User $user,
+        \DateTimeImmutable $create_date,
+        array $products = [],
+        \DateTimeImmutable $update_date = null,
+        int $status_id = null
+    ) {
+        parent::__construct($id, BaseEntity::TYPE_GUID_STR_36);
         $this->user = $user;
         $this->products = $products;
-        $this->status_id = self::STATUS_NEW;
+        $this->create_date = $create_date;
+        if ($update_date) {
+            $this->update_date = $update_date;
+        } else {
+            $this->update_date = $this->create_date;
+        }
+        if ($status_id) {
+            $this->status_id = self::STATUS_NEW;
+        } else {
+            $this->status_id = self::STATUS_NEW;
+        }
     }
 
     /**
@@ -84,12 +110,23 @@ class Order extends BaseEntity
         return $this->sum;
     }
 
+    public function getCreate_date()
+    {
+        return $this->create_date;
+    }
+
+    public function getUpdate_date()
+    {
+        return $this->update_date;
+    }
+
     public function addProduct(Product $product)
     {
         $this->products[] = $product;
         if ($this->sum) {
             $this->sum = $product->price;
         }
+        $this->update_date = new \DateTimeImmutable;
     }
 
     /**
@@ -102,5 +139,6 @@ class Order extends BaseEntity
         }
 
         $this->status_id = self::STATUS_PAID;
+        $this->update_date = new \DateTimeImmutable;
     }
 }

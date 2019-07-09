@@ -7,7 +7,7 @@ use src\repositories\ProductRepositoryInterface;
 /**
  * 
  */
-class OrderService
+class ProductService
 {
     /**
      * 
@@ -28,9 +28,22 @@ class OrderService
      */
     public function addDefaultProducts()
     {
-        $this->product_repository->addDefaultProducts();
-
-        return true;
+        return $this->product_repository->addDefaultProducts();
     }
 
+    /**
+     * @return \src\models\entities\Product
+     */
+    public function findProduct(string $id)
+    {
+        return $this->product_repository->getById($id);
+    }
+
+    /**
+     * @return \src\models\entities\Product
+     */
+    public function getAllProducts()
+    {
+        return $this->product_repository->getProductsList();
+    }
 }

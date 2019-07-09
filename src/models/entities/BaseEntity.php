@@ -1,6 +1,6 @@
 <?php
 
-namespace src\entities;
+namespace src\models\entities;
 
 class BaseEntity
 {
@@ -17,32 +17,36 @@ class BaseEntity
      */
     protected $id;
 
-    /**
-     * @var \DateTimeImmutable
-     */
-    protected $create_date;
-
-    /**
-     * @var \DateTimeImmutable
-     */
-    protected $update_date;
-
-    public function __construct(string $type)
+    public function __construct($id, string $type)
     {
-        if (!in_array($type, [
-            self::TYPE_GUID_STR_36,
-            self::TYPE_INT,
-        ])) {
-            throw new \DomainException(
-                'Попытка создания идентификатора неизвестного типа.'
-            );
-        }    
-        $this->type = $type;
-        if ($this->type == self::TYPE_GUID_STR_36) {
-            $this->id = $this->generateGuid();
+        $valid = false;
+        switch ($type) {
+            case self::TYPE_GUID_STR_36:
+                if (preg_match(
+                    '/^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/i',
+                    $id
+                )) {
+                    $valid = true;
+                }
+                break;
+            case self::TYPE_INT:
+                if (!is_string($id) && (is_int($id))) {
+                    $valid = true;
+                }
+                break;
+            default:
+                throw new \DomainException(
+                    'Попытка создания идентификатора неизвестного типа.'
+                );
         }
-        $this->create_date = new \DateTimeImmutable;
-        $this->update_date = new \DateTimeImmutable;
+
+        if (!$valid) {
+            throw new \DomainException(
+                'Значение идентификатора не соответствует типу.'
+            );
+        }
+        $this->type = $type;
+        $this->id = $id;
     }
 
     public function __set($name, $value)
@@ -77,46 +81,12 @@ class BaseEntity
         );
     }
 
-    public function setId($value)
-    {
-        $valid = false;
-        switch ($this->type) {
-            case 'guid_string_36':
-                throw new \BadMethodCallException('Setting read-only property: '
-                    . get_class($this) . '::$id'
-                );
-
-            case 'integer':
-                if (is_int($value)) {
-                    $valid = true;
-                }
-        }
-
-        if ($valid) {
-            $this->id = $value;
-        } else {
-            throw new \DomainException(
-                'Неверный тип идентификатора.'
-            );
-        }
-    }
-
     public function getId()
     {
         return $this->id;
     }
 
-    public function getCreate_date()
-    {
-        return $this->create_date;
-    }
-
-    public function getUpdate_date()
-    {
-        return $this->update_date;
-    }
-
-    private function generateGuid()
+    public static function generateGuid()
     {
         if (function_exists('com_create_guid') === true) {
             $guid = trim(com_create_guid(), '{}');

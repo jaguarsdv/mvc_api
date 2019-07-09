@@ -2,7 +2,7 @@
 
 namespace src\repositories;
 
-use src\entities\User;
+use src\models\entities\User;
 
 class UserRepository extends BaseRepository implements UserRepositoryInterface
 {

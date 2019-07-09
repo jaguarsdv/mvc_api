@@ -5,7 +5,10 @@ namespace src\services;
 use src\repositories\UserRepositoryInterface;
 use src\repositories\ProductRepositoryInterface;
 use src\repositories\OrderRepositoryInterface;
-use src\entities\Order;
+use src\models\entities\Order;
+use src\models\dto\CreateOrderDto;
+use src\models\dto\PayOrderDto;
+use Symfony\Component\HttpClient\HttpClient;
 
 /**
  * 
@@ -13,17 +16,17 @@ use src\entities\Order;
 class OrderService
 {
     /**
-     * 
+     * @var \src\repositories\UserRepository
      */
     private $user_repository;
 
     /**
-     * 
+     * @var \src\repositories\ProductRepository
      */
     private $product_repository;
 
     /**
-     * 
+     * @var \src\repositories\OrderRepository
      */
     private $order_repository;
 
@@ -43,36 +46,62 @@ class OrderService
     }
 
     /**
+     * Создает объект заказа и сохраняет данные в БД
      * 
+     * @return Order
      */
-    public function create(array $product_ids, int $user_id)
+    public function create(CreateOrderDto $dto)
     {
-        $products = $this->product_repository->getByIds($product_ids);
-        $user = $this->product_repository->getById($user_id);
-        $order = new Order($user, $products);
-        $this->product_repository->save($order);
+        $products = $this->product_repository->getByIds($dto->product_ids);
+
+        $user = $this->user_repository->getById($dto->user_id);
+        if (!$user) {
+            throw new \Exception('Пользователь с указаным идентификатором не найден');
+        }
+
+        $order = new Order(
+            Order::generateGuid(),
+            $user,
+            new \DateTimeImmutable,
+            $products
+        );
+        $this->order_repository->save($order);
 
         return $order;
     }
 
     /**
+     * Производит оплату заказа
      * 
+     * @return boolean
+     * @throws \Exception
      */
-    public function pay(string $order_id, float $sum)
+    public function pay(PayOrderDto $dto)
     {
-        $order = $this->order_repository->getById($order_id);
-        if ($order->status_id == Order::STATUS_NEW
-            && $order->sum == $sum
-        ) {
-            $response = 200;
-            if ($response == 200) {
-                $order->changeStatus(Order::STATUS_PAID);
-                $this->product_repository->save($order);
-
-                return true;
-            }
+        $order = $this->order_repository->getById($dto->order_id);
+        if (!$order) {
+            throw new \Exception('Заказ с указаным идентификатором не найден');
         }
 
-        return false;
+        if ($order->status_id != Order::STATUS_NEW) {
+            throw new \Exception("Оплатить можно только заказы в статусе 'Новый");
+        }
+
+        if ($order->sum == $dto->sum) {
+            throw new \Exception("Сумма заказа не совпадает с суммой оплаты");
+        }
+
+        $http_сlient = HttpClient::create();
+        $response = $http_сlient->request('GET', 'http://ya.ru');
+        $status_code = $response->getStatusCode();
+
+        if ($status_code == 200) {
+            throw new \Exception('Ошибка связи с платежной системой');
+        }
+
+        $order->changeStatus(Order::STATUS_PAID);
+        $this->order_repository->update($order);
+
+        return true;
     }
 }

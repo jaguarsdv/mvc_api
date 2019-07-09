@@ -3,9 +3,9 @@
 namespace tests\unit\entities\Order;
 
 use Codeception\Test\Unit;
-use src\entities\Order;
-use src\entities\User;
-use src\entities\Product;
+use src\models\entities\Order;
+use src\models\entities\User;
+use src\models\entities\Product;
 
 class CreateTest extends Unit
 {

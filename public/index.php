@@ -1,39 +1,41 @@
 <?php
-require_once './vendor/autoload.php';
+require_once '../vendor/autoload.php';
  
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Generator\UrlGenerator;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use src\controllers\OrderController;
+use src\controllers\DefaultController;
+use src\controllers\ProductController;
  
 try
 {
     $index_route = new Route(
         '/',
-        ['controller' => 'DefaultController', 'method'=>'index']
+        ['_controller' => DefaultController::class, '_method'=>'index']
     );
  
     $product_fill_route = new Route(
         '/product/fill-table',
-        ['controller' => 'ProductController', 'method'=>'fillProductTable'],
+        ['_controller' => ProductController::class, '_method'=>'fillProductTable'],
     );
    
     $product_get_all_route = new Route(
-        '/product/get-all',
-        ['controller' => 'ProductController', 'method'=>'getAll'],
+        '/product/get-list',
+        ['_controller' => ProductController::class, '_method'=>'getList'],
     );
    
     $order_create_route = new Route(
         '/order/create',
-        ['controller' => 'OrderController', 'method'=>'create'],
+        ['_controller' => OrderController::class, '_method'=>'create'],
     );
    
     $order_pay_route = new Route(
-        '/order/create',
-        ['controller' => 'OrderController', 'method'=>'pay'],
+        '/order/pay',
+        ['_controller' => OrderController::class, '_method'=>'pay'],
     );
    
     $routes = new RouteCollection();
@@ -43,27 +45,17 @@ try
     $routes->add('order_create_route', $order_create_route);
     $routes->add('order_pay_route', $order_pay_route);
  
-    // Init RequestContext object
+    $request = Request::createFromGlobals();
     $context = new RequestContext();
-    $context->fromRequest(Request::createFromGlobals());
+    $context->fromRequest($request);
  
-    // Init UrlMatcher object
     $matcher = new UrlMatcher($routes, $context);
- 
-    // Find the current route
-    $parameters = $matcher->match($context->getPathInfo());
- 
-    // How to generate a SEO URL
-    $generator = new UrlGenerator($routes, $context);
-    $url = $generator->generate('foo_placeholder_route', array(
-      'id' => 123,
-    ));
- 
-    echo '<pre>';
-    print_r($parameters);
- 
-    echo 'Generated URL: ' . $url;
-    exit;
+    $params = $matcher->match($context->getPathInfo());
+    $controller = $params['_controller'];
+    $method = $params['_method'];
+    unset($params);
+    
+    (new $controller($request))->$method();
 }
 catch (ResourceNotFoundException $e)
 {

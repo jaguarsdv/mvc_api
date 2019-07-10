@@ -4,5 +4,5 @@ namespace src\repositories;
 
 interface OrderRepositoryInterface
 {
-    public function getById(string $id);
+    public function findById(string $id);
 }

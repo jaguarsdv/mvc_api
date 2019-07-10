@@ -6,16 +6,22 @@ use src\services\OrderService;
 
 /**
  * DTO-объект оплаты заказа
+ * @OA\Schema()
  */
 class PayOrderDto
 {
     /**
      * @var string
+     * @OA\Property(
+     *     format="guid",
+     *     pattern="^[\da-fA-F]{8}-[\da-fA-F]{4}-[\da-fA-F]{4}-[\da-fA-F]{4}-[\da-fA-F]{12}$"
+     * )
      */
     public $order_id;
 
     /**
      * @var float
+     * @OA\Property()
      */
     public $amount;
 
@@ -28,7 +34,7 @@ class PayOrderDto
             $this->order_id = $data['order_id'];
         }
         if (isset($data['amount'])) {
-            $this->amount = $data['amount'];
+            $this->amount = (float) $data['amount'];
         }
     }
 
@@ -46,8 +52,8 @@ class PayOrderDto
             return 'Парвметр `order_id` должены быть строкой GUID';
         }
 
-        if (!is_float($this->amount)) {
-            return 'Сумма оплаты должена быть вещественным числом';
+        if ($this->amount == 0) {
+            return 'Сумма оплаты не не может равняться 0';
         }
 
         return true;

@@ -14,17 +14,30 @@ class PayTest extends Unit
         $this->expectExceptionMessage('Пустой заказ не может быть оплачен');
 
         $user = new User(1, 'admin', 'password');
-        $order = new Order($user);
-        $order->setStatusPaid();
+        $order = new Order(
+            Order::generateGuid(),
+            $user,
+            new \DateTimeImmutable
+        );
+        $order->changeStatus(Order::STATUS_PAID);
     }
 
     public function testOrderCanBePaid()
     {
         $user = new User(1, 'admin', 'password');
-        $order = new Order($user);
-        $product = new Product('Товар', 250.78);
+        $order = new Order(
+            Order::generateGuid(),
+            $user,
+            new \DateTimeImmutable
+        );
+        $product = new Product(
+            Product::generateGuid(),
+            'Товар',
+            250.78,
+            new \DateTimeImmutable,
+        );
         $order->addProduct($product);
-        $order->setStatusPaid();
+        $order->changeStatus(Order::STATUS_PAID);
 
         $this->assertEquals($order->status_id, Order::STATUS_PAID);
     }

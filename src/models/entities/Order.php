@@ -64,7 +64,7 @@ class Order extends BaseEntity
             $this->update_date = $this->create_date;
         }
         if ($status_id) {
-            $this->status_id = self::STATUS_NEW;
+            $this->status_id = $status_id;
         } else {
             $this->status_id = self::STATUS_NEW;
         }
@@ -107,7 +107,7 @@ class Order extends BaseEntity
             }
         }
 
-        return $this->sum;
+        return round($this->sum, 2);
     }
 
     public function getCreate_date()
@@ -132,7 +132,7 @@ class Order extends BaseEntity
     /**
      * @throws \DomainException
      */
-    public function setStatusPaid()
+    public function changeStatus(int $status)
     {
         if (empty($this->products)) {
             throw new \DomainException('Пустой заказ не может быть оплачен');

@@ -36,7 +36,7 @@ class ProductService
      */
     public function findProduct(string $id)
     {
-        return $this->product_repository->getById($id);
+        return $this->product_repository->findById($id);
     }
 
     /**

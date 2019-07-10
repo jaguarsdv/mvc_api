@@ -4,11 +4,13 @@ namespace src\models\dto;
 
 /**
  * DTO-объект создания заказа
+ * @OA\Schema()
  */
 class CreateOrderDto
 {
     /**
      * @var array
+     * @OA\Property(@OA\Items(type="string"))
      */
     public $product_ids;
 

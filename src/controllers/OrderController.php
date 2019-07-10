@@ -19,19 +19,18 @@ class OrderController extends BaseController
      *     operationId="create",
      *     tags={"order"},
      *     @OA\RequestBody(
-     *         description="Данные для расчета стоимости",
+     *         description="Данные для создания заказа",
      *         required=true,
-     *         @OA\JsonContent(ref="#/components/schemas/CalcRequest")
+     *         @OA\JsonContent(ref="#/components/schemas/CreateOrderDto")
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="Результат расчета",
-     *         @OA\JsonContent(ref="#/components/schemas/CalculateResult"),
-     *     ),
-     *     @OA\Response(
-     *         response="default",
-     *         description="unexpected error",
-     *         @OA\Schema(ref="#/components/schemas/Error")
+     *         description="Результат выполнения операции",
+     *         @OA\JsonContent( 
+     *             type="object",
+     *             @OA\Property(property="success", type="integer"),
+     *             @OA\Property(property="order_id", type="string")
+     *         ),
      *     )
      * )
      */
@@ -74,24 +73,23 @@ class OrderController extends BaseController
 
     /**
      * @OA\Post(
-     *     path="/order/create",
-     *     summary="Создание заказа",
-     *     operationId="create",
+     *     path="/order/pay",
+     *     summary="Оплатить заказа",
+     *     operationId="pay",
      *     tags={"order"},
      *     @OA\RequestBody(
-     *         description="Данные для расчета стоимости",
+     *         description="Данные для оплаты",
      *         required=true,
-     *         @OA\JsonContent(ref="#/components/schemas/CalcRequest")
+     *         @OA\JsonContent(ref="#/components/schemas/PayOrderDto")
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="Результат расчета",
-     *         @OA\JsonContent(ref="#/components/schemas/CalculateResult"),
-     *     ),
-     *     @OA\Response(
-     *         response="default",
-     *         description="unexpected error",
-     *         @OA\Schema(ref="#/components/schemas/Error")
+     *         description="Результат выполнения операции",
+     *         @OA\JsonContent( 
+     *             type="object",
+     *             @OA\Property(property="success", type="integer"),
+     *             @OA\Property(property="message", type="string")
+     *         ),
      *     )
      * )
      */
@@ -116,10 +114,10 @@ class OrderController extends BaseController
                 new OrderRepository($this->db)
             );
             try {
-                $order = $order_service->pay($dto);
+                $order_service->pay($dto);
                 $response = new JsonResponse([
                     "success" => 1,
-                    'order_id' => $order->id
+                    'message' => 'Операция прошла успешно'
                 ]);
             } catch (\Throwable $e) {
                 $response = new JsonResponse([

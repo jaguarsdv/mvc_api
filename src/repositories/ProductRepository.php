@@ -40,7 +40,7 @@ SQL;
         return $this->connection->executeUpdate($sql);
     }
 
-    public function getById(string $id)
+    public function findById(string $id)
     {
         $sql = "SELECT * FROM `product` WHERE `id` = ?";
         $stmt = $this->connection->prepare($sql);
@@ -50,7 +50,7 @@ SQL;
         return $this->instantiate($stmt->fetch());
     }
 
-    public function getByIds(array $ids)
+    public function findByIds(array $ids)
     {
         $stmt = $this->connection->executeQuery(
             "SELECT * FROM `product` WHERE `id` IN (?)",
@@ -74,6 +74,45 @@ SQL;
         }
 
         return $products;
+    }
+
+    public function getOrderProducts(string $order_id)
+    {
+        $sub_query = $this->connection->createQueryBuilder();
+        $sub_query->select('`product_id`')
+            ->from('`order_product`')
+            ->where('`order_id` = :order_id');
+
+        $query = $this->connection->createQueryBuilder();
+        $query->select('*')
+            ->from('`product`')
+            ->where($query->expr()->in('`id`', $sub_query->getSQL()))
+            ->setParameter(':order_id', $order_id);
+
+        $stmt = $query->execute();
+        $products = [];
+        while ($row = $stmt->fetch()) {
+            $products[] = $this->instantiate($row);
+        }
+
+        return $products;
+    }
+
+    public function getOrderProductIds(string $order_id)
+    {
+        $product_ids = [];
+        $query = $this->connection->createQueryBuilder()
+            ->select('`product_id`')
+            ->from('`order_product`')
+            ->where('`order_id` = :order_id')
+            ->setParameter(':order_id', $order_id)
+            ->execute();
+
+        while ($product_id = $query->fetchColumn()) {
+            $product_ids[] = $product_id;
+        }
+
+        return $product_ids;
     }
 
     private function instantiate(array $props)

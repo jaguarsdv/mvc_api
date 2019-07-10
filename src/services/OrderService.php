@@ -52,9 +52,9 @@ class OrderService
      */
     public function create(CreateOrderDto $dto)
     {
-        $products = $this->product_repository->getByIds($dto->product_ids);
+        $products = $this->product_repository->findByIds($dto->product_ids);
 
-        $user = $this->user_repository->getById($dto->user_id);
+        $user = $this->user_repository->findById($dto->user_id);
         if (!$user) {
             throw new \Exception('Пользователь с указаным идентификатором не найден');
         }
@@ -78,7 +78,8 @@ class OrderService
      */
     public function pay(PayOrderDto $dto)
     {
-        $order = $this->order_repository->getById($dto->order_id);
+        $order = $this->order_repository->findById($dto->order_id);
+
         if (!$order) {
             throw new \Exception('Заказ с указаным идентификатором не найден');
         }
@@ -87,7 +88,7 @@ class OrderService
             throw new \Exception("Оплатить можно только заказы в статусе 'Новый");
         }
 
-        if ($order->sum == $dto->sum) {
+        if (!(abs($order->sum - $dto->amount) < 0.001 )) {
             throw new \Exception("Сумма заказа не совпадает с суммой оплаты");
         }
 
@@ -95,12 +96,12 @@ class OrderService
         $response = $http_сlient->request('GET', 'http://ya.ru');
         $status_code = $response->getStatusCode();
 
-        if ($status_code == 200) {
+        if ($status_code != 200) {
             throw new \Exception('Ошибка связи с платежной системой');
         }
 
         $order->changeStatus(Order::STATUS_PAID);
-        $this->order_repository->update($order);
+        $this->order_repository->updateStatus($order->id, Order::STATUS_PAID);
 
         return true;
     }

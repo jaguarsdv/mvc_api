@@ -4,5 +4,5 @@ namespace src\repositories;
 
 interface UserRepositoryInterface
 {
-    public function getById(int $id);
+    public function findById(int $id);
 }

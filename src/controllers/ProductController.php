@@ -10,20 +10,23 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 class ProductController extends BaseController
 {
     /**
-     * @OA\Post(
+     * @OA\Get(
      *     path="/product/get-list",
      *     summary="Получить список товаров",
      *     operationId="get-list",
      *     tags={"product"},
      *     @OA\Response(
      *         response=200,
-     *         description="Результат расчета",
-     *         @OA\JsonContent(ref="#/components/schemas/CalculateResult"),
-     *     ),
-     *     @OA\Response(
-     *         response="default",
-     *         description="unexpected error",
-     *         @OA\Schema(ref="#/components/schemas/Error")
+     *         description="Результат выполнения операции",
+     *         @OA\JsonContent( 
+     *             type="object",
+     *             @OA\Property(property="success", type="integer"),
+     *             @OA\Property(
+     *                 property="products",
+     *                 type="array",
+     *                 @OA\Items(ref="#/components/schemas/ProductView")
+     *             ),
+     *         ),
      *     )
      * )
      */
@@ -32,19 +35,18 @@ class ProductController extends BaseController
         $product_service = new ProductService(
             new ProductRepository($this->db)
         );
-        $product = $product_service->findProduct('4DB203C0-6B6E-44D5-B2C9-95DB6B143012');
         $products = $product_service->getAllProducts();
         $view = new ProductView;
         $response = new JsonResponse([
             "success" => 1,
-            'products' => $view->render($product)
+            'products' => $view->render($products)
         ]);
 
         $response->send();
     }
 
     /**
-     * @OA\Post(
+     * @OA\Get(
      *     path="/product/fill-table",
      *     summary="Заполнить таблицу `product` дефолтными товарами",
      *     operationId="fill-table",
@@ -52,13 +54,12 @@ class ProductController extends BaseController
      *     @OA\Response(
      *         response=200,
      *         description="Результат выполнения операции",
-     *         @OA\JsonContent(ref="#/components/schemas/CalculateResult"),
+     *         @OA\JsonContent( 
+     *             type="object",
+     *             @OA\Property(property="success", type="integer"),
+     *             @OA\Property(property="message", type="string")
+     *         ),
      *     ),
-     *     @OA\Response(
-     *         response="default",
-     *         description="unexpected error",
-     *         @OA\Schema(ref="#/components/schemas/Error")
-     *     )
      * )
      */
     public function fillProductTable()

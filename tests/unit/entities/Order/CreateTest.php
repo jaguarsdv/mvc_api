@@ -12,7 +12,11 @@ class CreateTest extends Unit
     public function testOrderCreationSuccess()
     {
         $user = new User(1, 'admin', 'password');
-        $order = new Order($user);
+        $order = new Order(
+            Order::generateGuid(),
+            $user,
+            new \DateTimeImmutable
+        );
  
         $this->assertNotNull($order->user);
         $this->assertTrue($order->user instanceof User);
@@ -26,8 +30,16 @@ class CreateTest extends Unit
     public function testOrderAddingProduct()
     {
         $user = new User(1, 'admin', 'password');
-        $order = new Order($user);
-        $product = new Product('Товар', 250.78);
+        $order = new Order(
+            Order::generateGuid(),
+            $user,
+            new \DateTimeImmutable
+        );
+        $product = new Product(
+            Product::generateGuid(),
+            'Товар', 250.78,
+            new \DateTimeImmutable
+        );
         $order->addProduct($product);
  
         $this->assertContains($product, $order->products);

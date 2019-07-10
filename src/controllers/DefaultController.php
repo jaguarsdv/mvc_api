@@ -1,11 +1,13 @@
 <?php
 
 namespace src\controllers;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class DefaultController extends BaseController
 {
     public function index()
     {
-        echo 'ok';
+        $response = new RedirectResponse('/docs/index.html');
+        $response->send();
     }
 }

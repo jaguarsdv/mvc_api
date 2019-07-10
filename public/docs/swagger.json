@@ -1,0 +1,204 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Тестовое задание 'MVC REST API без фреймворка'",
+        "version": "0.1.0"
+    },
+    "paths": {
+        "/order/create": {
+            "post": {
+                "tags": [
+                    "order"
+                ],
+                "summary": "Создание заказа",
+                "operationId": "create",
+                "requestBody": {
+                    "description": "Данные для создания заказа",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateOrderDto"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Результат выполнения операции",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "integer"
+                                        },
+                                        "order_id": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/order/pay": {
+            "post": {
+                "tags": [
+                    "order"
+                ],
+                "summary": "Оплатить заказа",
+                "operationId": "pay",
+                "requestBody": {
+                    "description": "Данные для оплаты",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PayOrderDto"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Результат выполнения операции",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "integer"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/product/get-list": {
+            "get": {
+                "tags": [
+                    "product"
+                ],
+                "summary": "Получить список товаров",
+                "operationId": "get-list",
+                "responses": {
+                    "200": {
+                        "description": "Результат выполнения операции",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "integer"
+                                        },
+                                        "products": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/ProductView"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/product/fill-table": {
+            "get": {
+                "tags": [
+                    "product"
+                ],
+                "summary": "Заполнить таблицу `product` дефолтными товарами",
+                "operationId": "fill-table",
+                "responses": {
+                    "200": {
+                        "description": "Результат выполнения операции",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "integer"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "CreateOrderDto": {
+                "properties": {
+                    "product_ids": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "PayOrderDto": {
+                "properties": {
+                    "order_id": {
+                        "type": "string",
+                        "format": "guid",
+                        "pattern": "^[\\da-fA-F]{8}-[\\da-fA-F]{4}-[\\da-fA-F]{4}-[\\da-fA-F]{4}-[\\da-fA-F]{12}$"
+                    },
+                    "amount": {
+                        "type": "number",
+                        "format": "float"
+                    }
+                },
+                "type": "object"
+            },
+            "ProductView": {
+                "properties": {
+                    "id": {
+                        "description": "Идентификатор",
+                        "type": "string"
+                    },
+                    "name": {
+                        "description": "Наименование товара",
+                        "type": "string"
+                    },
+                    "price": {
+                        "description": "Цена товара",
+                        "type": "number"
+                    },
+                    "create_date": {
+                        "description": "Дата создания",
+                        "type": "string"
+                    },
+                    "update_date": {
+                        "description": "Дата обновления",
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            }
+        }
+    }
+}

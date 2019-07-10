@@ -9,7 +9,11 @@ class CreateTest extends Unit
 {
     public function testProductCreationSuccess()
     {
-        $product = new Product('Товар', 250.78);
+        $product = new Product(
+            Product::generateGuid(),
+            'Товар', 250.78,
+            new \DateTimeImmutable
+        );
  
         $this->assertNotNull($product->name);
         $this->assertNotNull($product->price);
@@ -20,10 +24,14 @@ class CreateTest extends Unit
     public function testProductIdIsReadOnly()
     {
         $this->expectExceptionMessage('Setting read-only property: '
-            . Product::class . '::$id'
+            . Product::class . '::id'
         );
  
-        $product = new Product('Товар', 250.78);
+        $product = new Product(
+            Product::generateGuid(),
+            'Товар', 250.78,
+            new \DateTimeImmutable
+        );
         $product->id = 3;
     }
 }
